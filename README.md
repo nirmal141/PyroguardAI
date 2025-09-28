@@ -62,8 +62,7 @@ PyroGuard AI/
 
 | Key | Action |
 |-----|--------|
-| **Arrow Keys** | Manual drone control |
-| **Space** | Toggle water suppression |
+| **Space** | Toggle random fire in the environment |
 | **R** | Reset simulation |
 | **W** | Change wind direction |
 | **Q** | Quit |
@@ -226,23 +225,6 @@ logs/
 │   ├── training_plots.png       # Visualization plots
 │   └── model_checkpoints/       # Saved models
 ```
-
-## 🌐 Website Showcase
-
-The project includes a professional website showcasing the system:
-
-```bash
-# Open website
-cd web
-open index.html
-```
-
-### Website Features
-- **Interactive demo** (removed for minimalism)
-- **Performance comparison** between approaches
-- **Training methodology** and reward structure
-- **Technology stack** overview
-- **Responsive design** with Tailwind CSS
 
 ## 🔧 Troubleshooting
 
