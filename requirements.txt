@@ -6,3 +6,21 @@ numpy>=1.24.0
 torch>=2.0.0
 matplotlib>=3.7.0
 scipy>=1.10.0
+
+# LLM and Edge AI dependencies
+transformers>=4.35.0
+tokenizers>=0.15.0
+onnxruntime>=1.16.0
+# For Snapdragon Elite NPU support (install separately):
+# onnxruntime-qnn>=1.16.0  # Qualcomm NPU provider
+bitsandbytes>=0.41.0
+accelerate>=0.24.0
+datasets>=2.14.0
+
+# Voice processing (optional)
+speechrecognition>=3.10.0
+pyaudio>=0.2.11
+
+# HTTP client
+requests>=2.31.0
+aiohttp>=3.9.0

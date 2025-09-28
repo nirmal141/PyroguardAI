@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-09-28T01:38:27.774098",
+  "models": {
+    "situation_analyzer": {
+      "model_path": "models/llm/situation_analyzer_optimized.onnx",
+      "optimization_id": "demo_opt_situation_analyzer",
+      "status": "demo_deployed"
+    },
+    "strategy_generator": {
+      "model_path": "models/llm/strategy_generator_optimized.onnx",
+      "optimization_id": "demo_opt_strategy_generator",
+      "status": "demo_deployed"
+    },
+    "command_parser": {
+      "model_path": "models/llm/command_parser_optimized.onnx",
+      "optimization_id": "demo_opt_command_parser",
+      "status": "demo_deployed"
+    }
+  },
+  "base_model": "microsoft/Phi-3-mini-4k-instruct"
+}
