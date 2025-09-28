@@ -57,14 +57,14 @@ class RLWildfireEnvironment(gym.Env):
         # Drone state
         self.drone_position = [1, 1]  # [row, col]
         self.drone_water = 100.0
-        self.drone_energy = 100.0
+        self.drone_energy = 500.0  # Same as simple drone
         self.max_water = 100.0
-        self.max_energy = 100.0
+        self.max_energy = 500.0  # Same as simple drone
         
         # Drone capabilities
-        self.detection_radius = 6
-        self.suppression_range = 1
-        self.movement_range = 2  # Can move up to 2 cells per action
+        self.detection_radius = 5  # Can detect fires within 5 cells (same as simple drone)
+        self.suppression_range = 1  # Can suppress fires within 1 cell (same as simple drone)
+        self.movement_range = 2  # Can move up to 2 cells per action (same as simple drone)
         
         # Performance tracking
         self.fires_extinguished = 0
@@ -205,7 +205,11 @@ class RLWildfireEnvironment(gym.Env):
         # 3. Step the wildfire environment
         env_state = self.env.step()
         
-        # 4. Calculate rewards
+        # 4. Base energy consumption (same as simple drone)
+        self.drone_energy -= 0.5
+        self.drone_energy = max(0, self.drone_energy)
+        
+        # 5. Calculate rewards
         reward += self._calculate_environmental_reward(prev_fires, prev_vegetation, prev_water, prev_energy)
         
         # 5. Check termination conditions
@@ -232,25 +236,35 @@ class RLWildfireEnvironment(gym.Env):
             return self.reward_config['crash_penalty']
         
         dr, dc = self.movement_directions[direction]
-        new_row = self.drone_position[0] + dr
-        new_col = self.drone_position[1] + dc
         
-        # Check bounds
-        if not (0 <= new_row < self.grid_size and 0 <= new_col < self.grid_size):
-            return self.reward_config['crash_penalty'] * 0.1  # Smaller penalty for boundary
+        # Move up to movement_range cells per action (same as simple drone)
+        moves_made = 0
+        current_row, current_col = self.drone_position
         
-        # Check if moving into dangerous terrain
-        cell_type = self.env.grid[new_row, new_col]
-        if cell_type == 4:  # Water - drone can fly over it
-            pass
-        elif cell_type in [2, 5]:  # Fire - dangerous but possible
-            self.drone_energy -= 5  # Extra energy cost in fire
+        while moves_made < self.movement_range:
+            new_row = current_row + dr
+            new_col = current_col + dc
+            
+            # Check bounds
+            if not (0 <= new_row < self.grid_size and 0 <= new_col < self.grid_size):
+                break  # Stop if we hit a boundary
+            
+            # Check if moving into dangerous terrain
+            cell_type = self.env.grid[new_row, new_col]
+            if cell_type == 4:  # Water - drone can fly over it
+                pass
+            elif cell_type in [2, 5]:  # Fire - dangerous but possible
+                self.drone_energy -= 5  # Extra energy cost in fire
+            
+            # Update position
+            current_row, current_col = new_row, new_col
+            moves_made += 1
         
-        # Update position
-        self.drone_position = [new_row, new_col]
+        # Update drone position
+        self.drone_position = [current_row, current_col]
         
-        # Energy cost for movement
-        self.drone_energy -= 2
+        # Energy cost for movement (proportional to distance moved)
+        self.drone_energy -= 1 * moves_made  # Reduced to be more consistent with simple drone
         self.drone_energy = max(0, self.drone_energy)
         
         # Small reward for moving towards fires

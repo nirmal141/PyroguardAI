@@ -515,6 +515,12 @@ class MultiDroneWildfireEnvironment(WildfireEnvironment):
                     self.fire_age[pos[0], pos[1]] = 0
                     self.total_fires_extinguished += 1
     
+    def change_wind(self):
+        """Change wind direction and strength randomly."""
+        import random
+        self.wind_direction = random.uniform(0, 360)
+        self.wind_strength = random.uniform(0.1, 0.4)
+        print(f"💨 Wind changed! Direction: {self.wind_direction:.1f}°, Strength: {self.wind_strength:.2f}")
     
     def render(self, mode='human'):
         """Enhanced rendering for multi-drone system."""
