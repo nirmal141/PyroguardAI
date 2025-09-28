@@ -1,0 +1,27 @@
+{
+  "model_name": "situation_analyzer",
+  "base_model": "meta-llama/Llama-3.1-8B",
+  "version": "1.0.0",
+  "optimization_target": "snapdragon_elite_npu",
+  "deployment_config": {
+    "task": "wildfire_situation_analysis",
+    "input_format": "grid_state + drone_status + weather_data",
+    "output_format": "structured_analysis_json",
+    "max_input_tokens": 1024,
+    "max_output_tokens": 512,
+    "temperature": 0.3,
+    "specialization": "fire_pattern_analysis"
+  },
+  "performance_targets": {
+    "max_latency_ms": 300,
+    "max_memory_mb": 2048,
+    "min_throughput_tokens_per_sec": 50
+  },
+  "cirrascale_training": {
+    "epochs": 3,
+    "batch_size": 2,
+    "learning_rate": 5e-06,
+    "lora_r": 16,
+    "lora_alpha": 32
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "npu_enabled": true,
+  "npu_device_id": 0,
+  "performance_mode": "high_performance",
+  "enable_fast_math": true,
+  "enable_mixed_precision": true,
+  "expected_speedup": "5-10x",
+  "npu_tops": 45
+}

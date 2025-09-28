@@ -1,0 +1,38 @@
+{
+  "endpoint": "https://api.cirrascale.com",
+  "api_key": "b5e4ad4a-ec15-44d1-b331-7736128493b4",
+  "project_id": "pyroguard-ai",
+  "gpu_type": "A100",
+  "num_gpus": 4,
+  "region": "us-west-2",
+  "base_model": "meta-llama/Llama-3.1-8B",
+  "training_config": {
+    "epochs": 3,
+    "batch_size": 2,
+    "learning_rate": 5e-06,
+    "warmup_steps": 100,
+    "gradient_accumulation_steps": 16,
+    "fp16": true,
+    "max_sequence_length": 4096,
+    "lora_config": {
+      "r": 16,
+      "lora_alpha": 32,
+      "target_modules": [
+        "q_proj",
+        "v_proj",
+        "k_proj",
+        "o_proj"
+      ],
+      "lora_dropout": 0.1
+    }
+  },
+  "optimization_config": {
+    "target_deployment": "edge",
+    "quantization": "int8",
+    "max_memory_mb": 6144,
+    "max_latency_ms": 500,
+    "npu_optimization": true,
+    "target_npu": "snapdragon_elite",
+    "npu_tops": 45
+  }
+}

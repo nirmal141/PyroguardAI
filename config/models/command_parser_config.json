@@ -1,0 +1,27 @@
+{
+  "model_name": "command_parser",
+  "base_model": "meta-llama/Llama-3.1-8B",
+  "version": "1.0.0",
+  "optimization_target": "snapdragon_elite_npu",
+  "deployment_config": {
+    "task": "voice_command_parsing",
+    "input_format": "natural_language_command",
+    "output_format": "structured_drone_action",
+    "max_input_tokens": 256,
+    "max_output_tokens": 128,
+    "temperature": 0.1,
+    "specialization": "intent_recognition"
+  },
+  "performance_targets": {
+    "max_latency_ms": 300,
+    "max_memory_mb": 2048,
+    "min_throughput_tokens_per_sec": 50
+  },
+  "cirrascale_training": {
+    "epochs": 3,
+    "batch_size": 2,
+    "learning_rate": 5e-06,
+    "lora_r": 16,
+    "lora_alpha": 32
+  }
+}
