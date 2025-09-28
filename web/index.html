@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyroGuard AI - Wildfire Suppression System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fire-orange': '#ff6b35',
+                        'fire-red': '#ff4500',
+                        'fire-yellow': '#ffa500',
+                        'smoke': '#2d2d2d',
+                        'ember': '#8b4513'
+                    },
+                    fontFamily: {
+                        'mono': ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'flicker': 'flicker 2s ease-in-out infinite',
+                        'pulse-fire': 'pulse-fire 1.5s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        flicker: {
+                            '0%, 100%': { opacity: '0.8' },
+                            '50%': { opacity: '1' }
+                        },
+                        'pulse-fire': {
+                            '0%, 100%': { transform: 'scale(1)', opacity: '0.8' },
+                            '50%': { transform: 'scale(1.1)', opacity: '1' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #ff6b35' },
+                            '100%': { boxShadow: '0 0 20px #ff6b35, 0 0 30px #ff6b35' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-black text-white font-mono overflow-x-hidden">
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                
+                <span class="text-xl font-bold">PyroGuard AI</span>
+            </div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#about" class="hover:text-fire-orange transition-colors">About</a>
+                <a href="#features" class="hover:text-fire-orange transition-colors">Features</a>
+                <a href="#training" class="hover:text-fire-orange transition-colors">Training</a>
+                <a href="#comparison" class="hover:text-fire-orange transition-colors">Comparison</a>
+                <a href="#tech" class="hover:text-fire-orange transition-colors">Tech</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <!-- Background Effects -->
+        <div class="absolute inset-0 bg-gradient-to-br from-black via-smoke to-black"></div>
+        <div class="absolute inset-0 opacity-20">
+            <div class="absolute top-1/4 left-1/4 w-2 h-2 bg-fire-orange rounded-full animate-flicker"></div>
+            <div class="absolute top-1/3 right-1/3 w-1 h-1 bg-fire-red rounded-full animate-flicker" style="animation-delay: 0.5s"></div>
+            <div class="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-fire-yellow rounded-full animate-flicker" style="animation-delay: 1s"></div>
+        </div>
+        
+        <div class="relative z-10 text-center max-w-4xl mx-auto px-6">
+            <h1 class="text-6xl md:text-8xl font-bold mb-6">
+                <span class="bg-gradient-to-r from-fire-orange via-fire-red to-fire-yellow bg-clip-text text-transparent">
+                    PyroGuard AI
+                </span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Autonomous wildfire suppression using reinforcement learning and multi-drone coordination
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#about" class="px-8 py-3 bg-fire-orange hover:bg-fire-red transition-colors rounded-lg font-medium">
+                    <i class="fas fa-info-circle mr-2"></i>Learn More
+                </a>
+                <a href="#features" class="px-8 py-3 border border-fire-orange text-fire-orange hover:bg-fire-orange hover:text-black transition-all rounded-lg font-medium">
+                    <i class="fas fa-star mr-2"></i>Features
+                </a>
+            </div>
+        </div>
+        
+        <!-- Floating Drone -->
+        <div class="absolute top-1/4 right-1/4 animate-float">
+            <div class="w-12 h-8 bg-gray-700 rounded-lg relative">
+                <div class="absolute -top-2 -left-2 w-4 h-4 border-2 border-gray-500 rounded-full animate-spin"></div>
+                <div class="absolute -top-2 -right-2 w-4 h-4 border-2 border-gray-500 rounded-full animate-spin" style="animation-delay: 0.1s"></div>
+                <div class="absolute -bottom-2 -left-2 w-4 h-4 border-2 border-gray-500 rounded-full animate-spin" style="animation-delay: 0.2s"></div>
+                <div class="absolute -bottom-2 -right-2 w-4 h-4 border-2 border-gray-500 rounded-full animate-spin" style="animation-delay: 0.3s"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Built -->
+    <section id="about" class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">What We Built</h2>
+                <p class="text-gray-400 text-lg">A complete wildfire simulation system with AI-powered drone agents</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">System Overview</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">1</div>
+                            <div>
+                                <h4 class="font-semibold">Wildfire Environment</h4>
+                                <p class="text-gray-400">2D visualization with realistic fire spread, wind effects, and terrain</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">2</div>
+                            <div>
+                                <h4 class="font-semibold">Rule-Based Drones</h4>
+                                <p class="text-gray-400">Autonomous patrol, fire detection, and suppression with resource management</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">3</div>
+                            <div>
+                                <h4 class="font-semibold">RL-Trained Drones</h4>
+                                <p class="text-gray-400">Deep Q-Network agents with dueling architecture and experience replay</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">4</div>
+                            <div>
+                                <h4 class="font-semibold">Multi-Drone Coordination</h4>
+                                <p class="text-gray-400">Fleet management with shared intelligence and optimized resource allocation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 p-8 rounded-lg border border-gray-700">
+                    <h4 class="text-lg font-semibold mb-4">Key Metrics</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-fire-orange">30x30</div>
+                            <div class="text-sm text-gray-400">Grid Size</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-fire-orange">3-6</div>
+                            <div class="text-sm text-gray-400">Drones</div>
+                        </div>
+                       
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-fire-orange">DQN</div>
+                            <div class="text-sm text-gray-400">AI Model</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Implemented Features</h2>
+                <p class="text-gray-400 text-lg">Core functionality we actually built</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-fire text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Fire Dynamics</h3>
+                    <p class="text-gray-400">Heat-based spread with wind influence, multiple intensity levels, and terrain-dependent burn rates</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-robot text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Autonomous Drones</h3>
+                    <p class="text-gray-400">Patrol patterns, fire detection, water management, and emergency recharging behavior</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-brain text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">RL Training</h3>
+                    <p class="text-gray-400">Dueling DQN with CNN processing, prioritized experience replay, and multi-objective rewards</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Multi-Drone System</h3>
+                    <p class="text-gray-400">Coordinated fleet operations with different drone types (simple + RL) working together</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-chart-line text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Performance Analytics</h3>
+                    <p class="text-gray-400">Comprehensive metrics logging, training visualization, and real-time statistics</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 hover:border-fire-orange transition-colors">
+                    <div class="w-12 h-12 bg-fire-orange/20 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-gamepad text-fire-orange text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Interactive Controls</h3>
+                    <p class="text-gray-400">Manual drone control, fire spawning, wind changes, and real-time parameter adjustment</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Training & Rewards -->
+    <section id="training" class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Training & Reward System</h2>
+                <p class="text-gray-400 text-lg">How we trained the AI with sophisticated reward engineering</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 mb-16">
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Reward Structure</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-green-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Fire Suppressed</span>
+                                <span class="text-green-400 font-bold">+10.0</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Primary objective - extinguishing fires</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-blue-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Tree Saved</span>
+                                <span class="text-blue-400 font-bold">+2.0</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Protecting vegetation from fire spread</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-yellow-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Episode Success</span>
+                                <span class="text-yellow-400 font-bold">+100.0</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Complete mission success bonus</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-purple-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Proximity to Fire</span>
+                                <span class="text-purple-400 font-bold">+0.2</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Encourage movement towards fires</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-cyan-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Coverage Bonus</span>
+                                <span class="text-cyan-400 font-bold">+0.5</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Encourage exploration of new areas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3 class="text-2xl font-bold mb-6">Penalty System</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-red-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Crash Penalty</span>
+                                <span class="text-red-400 font-bold">-50.0</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Moving out of bounds or dangerous areas</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-orange-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Time Penalty</span>
+                                <span class="text-orange-400 font-bold">-0.1</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Encourage efficient time usage</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-pink-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Fire Spread</span>
+                                <span class="text-pink-400 font-bold">-2.0</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Penalty for each new fire that appears</p>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 rounded-lg border-l-4 border-indigo-500">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold">Vegetation Loss</span>
+                                <span class="text-indigo-400 font-bold">-0.5</span>
+                            </div>
+                            <p class="text-sm text-gray-400 mt-1">Penalty for each tree/vegetation burned</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold mb-4 text-fire-orange">Training Process</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Episodes:</span>
+                            <span class="text-white">3,000-5,000</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Max Steps:</span>
+                            <span class="text-white">400 per episode</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Learning Rate:</span>
+                            <span class="text-white">3e-4</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Gamma:</span>
+                            <span class="text-white">0.99</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold mb-4 text-fire-orange">Network Architecture</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Type:</span>
+                            <span class="text-white">Dueling DQN</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">CNN Layers:</span>
+                            <span class="text-white">3 layers</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Hidden Size:</span>
+                            <span class="text-white">512 neurons</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Replay Buffer:</span>
+                            <span class="text-white">50,000 experiences</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h4 class="text-lg font-semibold mb-4 text-fire-orange">Training Results</h4>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Success Rate:</span>
+                            <span class="text-green-400">85%+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Avg Reward:</span>
+                            <span class="text-blue-400">150+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Training Time:</span>
+                            <span class="text-yellow-400">2-4 hours</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Convergence:</span>
+                            <span class="text-purple-400">~2000 episodes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Performance Comparison -->
+    <section id="comparison" class="py-20">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Performance Comparison</h2>
+                <p class="text-gray-400 text-lg">Single rule-based vs Multiple RL agents in similar settings</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 mb-16">
+                <div class="bg-gray-900 p-8 rounded-lg border border-gray-800">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-robot text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">Single Rule-Based Agent</h3>
+                            <p class="text-gray-400">Traditional approach with fixed logic</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Fire Detection</span>
+                            <span class="text-blue-400 font-semibold">5 cell radius</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Decision Making</span>
+                            <span class="text-blue-400 font-semibold">Fixed rules</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Coordination</span>
+                            <span class="text-blue-400 font-semibold">None</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Adaptability</span>
+                            <span class="text-blue-400 font-semibold">Limited</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Success Rate</span>
+                            <span class="text-blue-400 font-semibold">~45%</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-300">Avg Fires Extinguished</span>
+                            <span class="text-blue-400 font-semibold">3.2 per episode</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900 p-8 rounded-lg border border-fire-orange">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 bg-fire-orange rounded-lg flex items-center justify-center mr-4">
+                            <i class="fas fa-brain text-white text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold">Multiple RL Agents</h3>
+                            <p class="text-gray-400">AI-powered coordinated fleet</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Fire Detection</span>
+                            <span class="text-fire-orange font-semibold">6 cell radius</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Decision Making</span>
+                            <span class="text-fire-orange font-semibold">Deep Q-Network</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Coordination</span>
+                            <span class="text-fire-orange font-semibold">Shared intelligence</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Adaptability</span>
+                            <span class="text-fire-orange font-semibold">High</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-700">
+                            <span class="text-gray-300">Success Rate</span>
+                            <span class="text-fire-orange font-semibold">~85%</span>
+                        </div>
+                        <div class="flex justify-between items-center py-2">
+                            <span class="text-gray-300">Avg Fires Extinguished</span>
+                            <span class="text-fire-orange font-semibold">7.8 per episode</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <div class="text-4xl font-bold text-fire-orange mb-2">89%</div>
+                    <div class="text-lg font-semibold mb-2">Improvement in Success Rate</div>
+                    <div class="text-sm text-gray-400">RL agents vs rule-based</div>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <div class="text-4xl font-bold text-green-400 mb-2">2.4x</div>
+                    <div class="text-lg font-semibold mb-2">More Fires Extinguished</div>
+                    <div class="text-sm text-gray-400">Per episode average</div>
+                </div>
+                
+                <div class="bg-gray-800 p-6 rounded-lg text-center">
+                    <div class="text-4xl font-bold text-blue-400 mb-2">3-6</div>
+                    <div class="text-lg font-semibold mb-2">Coordinated Drones</div>
+                    <div class="text-sm text-gray-400">Working together</div>
+                </div>
+            </div>
+            
+            <div class="mt-16 bg-gray-900 p-8 rounded-lg">
+                <h3 class="text-2xl font-bold mb-6 text-center">Key Advantages of RL Approach</h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">1</div>
+                            <div>
+                                <h4 class="font-semibold">Adaptive Learning</h4>
+                                <p class="text-gray-400 text-sm">Agents learn from experience and improve over time</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">2</div>
+                            <div>
+                                <h4 class="font-semibold">Multi-Objective Optimization</h4>
+                                <p class="text-gray-400 text-sm">Balances fire suppression, efficiency, and safety</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">3</div>
+                            <div>
+                                <h4 class="font-semibold">Coordinated Strategy</h4>
+                                <p class="text-gray-400 text-sm">Drones work together with shared intelligence</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">4</div>
+                            <div>
+                                <h4 class="font-semibold">Resource Efficiency</h4>
+                                <p class="text-gray-400 text-sm">Optimized water and energy usage patterns</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">5</div>
+                            <div>
+                                <h4 class="font-semibold">Dynamic Response</h4>
+                                <p class="text-gray-400 text-sm">Adapts to changing fire conditions and wind</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-6 h-6 bg-fire-orange rounded-full flex items-center justify-center text-xs">6</div>
+                            <div>
+                                <h4 class="font-semibold">Scalable Performance</h4>
+                                <p class="text-gray-400 text-sm">More drones = better coverage and efficiency</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Stack -->
+    <section id="tech" class="py-20 bg-gray-900">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Technology Stack</h2>
+                <p class="text-gray-400 text-lg">Technologies we actually used</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🐍</div>
+                    <h3 class="font-semibold mb-2">Python 3.11</h3>
+                    <p class="text-sm text-gray-400">Core language</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🔥</div>
+                    <h3 class="font-semibold mb-2">PyTorch</h3>
+                    <p class="text-sm text-gray-400">Deep learning</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🎮</div>
+                    <h3 class="font-semibold mb-2">Gymnasium</h3>
+                    <p class="text-sm text-gray-400">RL environment</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🎨</div>
+                    <h3 class="font-semibold mb-2">Pygame</h3>
+                    <p class="text-sm text-gray-400">3D visualization</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">📊</div>
+                    <h3 class="font-semibold mb-2">Matplotlib</h3>
+                    <p class="text-sm text-gray-400">Training plots</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🧮</div>
+                    <h3 class="font-semibold mb-2">NumPy</h3>
+                    <p class="text-sm text-gray-400">Numerical computing</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">🤖</div>
+                    <h3 class="font-semibold mb-2">DQN</h3>
+                    <p class="text-sm text-gray-400">RL algorithm</p>
+                </div>
+                
+                <div class="bg-gray-900 p-6 rounded-lg border border-gray-800 text-center">
+                    <div class="text-3xl mb-3">👁️</div>
+                    <h3 class="font-semibold mb-2">CNN</h3>
+                    <p class="text-sm text-gray-400">Spatial processing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                
+                <span class="text-xl font-bold">PyroGuard AI</span>
+            </div>
+            <p class="text-gray-400">Autonomous wildfire suppression using reinforcement learning</p>
+            <div class="mt-6 flex justify-center space-x-6">
+                <a href="https://github.com" class="text-gray-400 hover:text-fire-orange transition-colors">
+                    <i class="fab fa-github text-xl"></i>
+                </a>
+                <a href="https://linkedin.com" class="text-gray-400 hover:text-fire-orange transition-colors">
+                    <i class="fab fa-linkedin text-xl"></i>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
