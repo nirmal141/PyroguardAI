@@ -1,10 +1,5 @@
 {
   "timestamp": "2025-09-28T01:38:27.774098",
-  "cirrascale_config": {
-    "endpoint": "https://api.cirrascale.com",
-    "project_id": "pyroguard-ai",
-    "gpu_type": "A100"
-  },
   "models": {
     "situation_analyzer": {
       "model_path": "models/llm/situation_analyzer_optimized.onnx",

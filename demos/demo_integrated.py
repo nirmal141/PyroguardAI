@@ -28,7 +28,7 @@ from environment.wildfire_env import WildfireEnvironment
 from drones.rl.rl_environment import RLWildfireEnvironment
 from drones.rl.rl_agent import create_rl_drone
 from drones.simple.firefighter_drone import FirefighterDrone
-from drones.llm.cirrascale_llm_drone import create_cirrascale_llm_drone
+# from drones.llm.cirrascale_llm_drone import create_cirrascale_llm_drone  # Removed cirrascale support
 
 
 class RLIntegratedWildfireEnvironment(WildfireEnvironment):
@@ -44,24 +44,18 @@ class RLIntegratedWildfireEnvironment(WildfireEnvironment):
                  fire_persistence: int = 4,
                  new_fire_rate: float = 0.08,
                  drone_type: str = "simple",
-                 rl_model_path: Optional[str] = None,
-                 cirrascale_config: Optional[Dict] = None,
-                 llm_model_path: Optional[str] = None):
+                 rl_model_path: Optional[str] = None):
         """
         Initialize the enhanced wildfire environment.
         
         Args:
-            drone_type: "simple", "rl", or "llm" for drone type
+            drone_type: "simple" or "rl" for drone type
             rl_model_path: Path to trained RL model (required if drone_type="rl")
-            cirrascale_config: Cirrascale configuration (required if drone_type="llm")
-            llm_model_path: Path to edge-optimized LLM model (required if drone_type="llm")
             Other args same as base WildfireEnvironment
         """
         
         self.drone_type = drone_type
         self.rl_model_path = rl_model_path
-        self.cirrascale_config = cirrascale_config
-        self.llm_model_path = llm_model_path
         
         # Initialize base environment with drones enabled so rendering works
         super().__init__(
@@ -89,26 +83,6 @@ class RLIntegratedWildfireEnvironment(WildfireEnvironment):
             start_position = (1, 1)
             self.drone = FirefighterDrone(start_position, self.grid_size)
             print("🚁 Simple rule-based firefighter drone deployed")
-            
-        elif self.drone_type == "llm":
-            # Use Cirrascale LLM-enhanced drone
-            if not self.llm_model_path:
-                print("⚠️ LLM drone requested but no model path provided")
-                print("🔄 Falling back to simple drone...")
-                self.drone_type = "simple"
-                self._initialize_drone_system()
-                return
-            
-            start_position = (1, 1)
-            self.drone = create_cirrascale_llm_drone(
-                position=start_position,
-                cirrascale_config=self.cirrascale_config,
-                edge_model_path=self.llm_model_path
-            )
-            print("🤖 Cirrascale LLM-enhanced firefighter drone deployed")
-            print(f"   Model: {self.llm_model_path}")
-            if self.cirrascale_config:
-                print(f"   Cirrascale: Connected to {self.cirrascale_config.get('endpoint', 'cloud')}")
             
         elif self.drone_type == "rl":
             if not self.rl_model_path or not os.path.exists(self.rl_model_path):
@@ -198,30 +172,6 @@ class RLIntegratedWildfireEnvironment(WildfireEnvironment):
             if hasattr(self, 'drone') and self.drone:
                 drone_action = self.drone.update(self.grid)
                 self._process_simple_drone_action(drone_action)
-                
-                # Add drone info to state
-                state['drone_action'] = drone_action
-                state['drone_status'] = self.drone.get_status()
-        
-        elif self.drone_type == "llm":
-            # Use LLM drone logic
-            if hasattr(self, 'drone') and self.drone:
-                # Check if this is actually an LLM drone or fallback simple drone
-                if hasattr(self.drone, 'llm_processor'):
-                    # True LLM drone - prepare weather data for LLM analysis
-                    weather_data = {
-                        'wind_direction': self.wind_direction,
-                        'wind_strength': self.wind_strength,
-                        'temperature': 25,  # Could be dynamic
-                        'humidity': 30      # Could be dynamic
-                    }
-                    
-                    drone_action = self.drone.update(self.grid, weather_data)
-                    self._process_llm_drone_action(drone_action)
-                else:
-                    # Fallback simple drone - use simple update method
-                    drone_action = self.drone.update(self.grid)
-                    self._process_simple_drone_action(drone_action)
                 
                 # Add drone info to state
                 state['drone_action'] = drone_action
@@ -460,21 +410,6 @@ class RLIntegratedWildfireEnvironment(WildfireEnvironment):
                     self.fire_age[pos[0], pos[1]] = 0
                     self.fires_extinguished += 1
     
-    def _process_llm_drone_action(self, drone_action: Dict):
-        """Process action from LLM drone."""
-        action_type = drone_action.get('action')
-        pos = drone_action.get('position')
-        
-        if action_type == 'fire_suppressed' and pos and self._is_valid_position(pos):
-            if self.grid[pos[0], pos[1]] in [self.FIRE, self.FIRE_INTENSE]:
-                self.grid[pos[0], pos[1]] = self.BURNED
-                self.fire_age[pos[0], pos[1]] = 0
-                self.fires_extinguished += 1
-                
-                # Log LLM reasoning if available
-                if drone_action.get('llm_reasoning'):
-                    strategy = drone_action.get('strategy', 'No strategy provided')
-                    print(f"🤖 LLM Strategy: {strategy[:100]}...")  # Truncate for display
     
     def render(self, mode='human'):
         """Enhanced rendering - base class handles drone rendering."""
@@ -583,20 +518,13 @@ def main():
                        help='Path to trained RL model')
     parser.add_argument('--grid-size', type=int, default=25,
                        help='Grid size (default: 25)')
-    parser.add_argument('--drone-type', type=str, choices=['simple', 'rl', 'llm'], default='simple',
+    parser.add_argument('--drone-type', type=str, choices=['simple', 'rl'], default='simple',
                        help='Drone type to use (default: simple)')
-    parser.add_argument('--cirrascale-endpoint', type=str, default=None,
-                       help='Cirrascale cloud endpoint for LLM training')
-    parser.add_argument('--cirrascale-api-key', type=str, default=None,
-                       help='Cirrascale API key')
-    parser.add_argument('--llm-model-path', type=str, default=None,
-                       help='Path to edge-optimized LLM model')
     
     args = parser.parse_args()
     
     # Determine drone type and prepare configurations
     drone_type = args.drone_type
-    cirrascale_config = None
     
     if drone_type == "rl" and not args.model_path:
         print("⚠️ RL drone requested but no model path provided")
@@ -617,34 +545,6 @@ def main():
             print("❌ Models directory not found, falling back to simple drone")
             drone_type = "simple"
     
-    elif drone_type == "llm":
-        if not args.llm_model_path:
-            print("⚠️ LLM drone requested but no model path provided")
-            print("🔍 Looking for LLM models in 'models/llm' directory...")
-            
-            llm_model_dir = 'models/llm'
-            if os.path.exists(llm_model_dir):
-                model_files = [f for f in os.listdir(llm_model_dir) if f.endswith(('.pth', '.onnx', '.bin'))]
-                if model_files:
-                    args.llm_model_path = os.path.join(llm_model_dir, model_files[0])
-                    print(f"📂 Found LLM model: {args.llm_model_path}")
-                else:
-                    print("❌ No LLM models found, falling back to simple drone")
-                    drone_type = "simple"
-            else:
-                print("❌ LLM models directory not found, falling back to simple drone")
-                drone_type = "simple"
-        
-        # Setup Cirrascale configuration if provided
-        if args.cirrascale_endpoint and args.cirrascale_api_key:
-            cirrascale_config = {
-                'endpoint': args.cirrascale_endpoint,
-                'api_key': args.cirrascale_api_key,
-                'project_id': 'pyroguard-ai',
-                'gpu_type': 'A100',
-                'num_gpus': 4
-            }
-            print(f"🌩️ Cirrascale configuration loaded: {args.cirrascale_endpoint}")
     
     print(f"🔥 PyroGuard AI Demo - {drone_type.upper()} Drone")
     print("=" * 50)
@@ -658,9 +558,7 @@ def main():
         fire_persistence=5,
         new_fire_rate=0.02,
         drone_type=drone_type,
-        rl_model_path=args.model_path,
-        cirrascale_config=cirrascale_config,
-        llm_model_path=args.llm_model_path
+        rl_model_path=args.model_path
     )
     
     # Initialize and run
@@ -671,9 +569,6 @@ def main():
     print("  - W: Change wind")
     print("  - R: Reset environment")
     print("  - Click: Ignite terrain")
-    if drone_type == "llm":
-        print("  - V: Voice command (LLM drone)")
-        print("  - S: Situation analysis (LLM)")
     print("  - Close window or Ctrl+C to exit")
     
     try:

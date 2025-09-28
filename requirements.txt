@@ -21,6 +21,6 @@ datasets>=2.14.0
 speechrecognition>=3.10.0
 pyaudio>=0.2.11
 
-# HTTP client for Cirrascale API
+# HTTP client
 requests>=2.31.0
 aiohttp>=3.9.0
