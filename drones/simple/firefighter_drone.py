@@ -17,10 +17,10 @@ class FirefighterDrone:
         self.suppression_range = 1  # Can suppress fires within 1 cell
         self.movement_speed = 2    # Moves 2 cells per step for faster response
         
-        # Water and energy
-        self.max_water = 20
+        # Water and energy - Increased for longer missions
+        self.max_water = 100  # 5x more water capacity
         self.water_level = self.max_water
-        self.max_energy = 100
+        self.max_energy = 500  # 5x more energy capacity
         self.energy = self.max_energy
         
         # Mission state
@@ -40,16 +40,16 @@ class FirefighterDrone:
         
         self.steps_taken += 1
         
-        # Consume energy
-        self.energy = max(0, self.energy - 1)
+        # Consume energy - Reduced consumption for longer missions
+        self.energy = max(0, self.energy - 0.5)
         
         # Update trail for visualization
         self.trail.append(tuple(self.position))
         if len(self.trail) > self.max_trail_length:
             self.trail.pop(0)
         
-        # Check if drone needs to return to base
-        if self.energy < 20 or self.water_level == 0:
+        # Check if drone needs to return to base - Lower thresholds for longer missions
+        if self.energy < 50 or self.water_level < 5:
             return self._return_to_base()
         
         # Scan for fires in detection radius
@@ -129,8 +129,8 @@ class FirefighterDrone:
                 # Check if there's a fire here
                 cell_type = environment_grid[target_row, target_col]
                 if cell_type in [2, 5]:  # FIRE or FIRE_INTENSE
-                    # Suppress the fire
-                    self.water_level = max(0, self.water_level - 2)
+                    # Suppress the fire - Reduced water consumption
+                    self.water_level = max(0, self.water_level - 1)
                     self.fires_extinguished += 1
                     
                     # Remove from known fires
