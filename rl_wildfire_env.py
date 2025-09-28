@@ -148,6 +148,8 @@ class RLWildfireEnv(gym.Env):
             # Use drone's built-in suppression
             result = drone._try_suppress_fire(self.base_env.grid)
             if result['action'] == 'fire_suppressed':
+                # CRITICAL: Process the fire suppression in the environment
+                self.base_env._process_drone_action(result)
                 return 5.0  # High reward for fire suppression
             else:
                 return -0.1  # Small penalty for failed suppression
@@ -202,29 +204,44 @@ class RLWildfireEnv(gym.Env):
         if fires_extinguished > 0:
             # Calculate spread potential of extinguished fires
             spread_bonus = self._calculate_fire_spread_potential_bonus()
-            reward += 10.0 * fires_extinguished + spread_bonus
+            reward += 15.0 * fires_extinguished + spread_bonus  # Increased base reward
+        
+        # 1b. Reward for attempting to suppress fires (even if unsuccessful)
+        if self._is_near_fire_for_suppression():
+            reward += 0.5  # Small reward for being in position to suppress
         
         # 2. Fire spread prevention reward
         fire_spread_penalty = self._calculate_fire_spread_penalty()
         reward += fire_spread_penalty
         
-        # 3. Efficiency rewards
+        # 3. Efficiency rewards - ENHANCED
         if drone.target_fire:
             distance_to_target = self._distance_to(drone.target_fire)
             if distance_to_target < 3:
-                reward += 1.0  # Reward for being close to target fire
+                reward += 2.0  # Increased reward for being close to target fire
+            elif distance_to_target < 5:
+                reward += 0.5  # Small reward for approaching target fire
         
-        # 4. Resource management
-        if drone.energy < 20 or drone.water_level == 0:
-            reward -= 2.0  # Penalty for poor resource management
+        # 3b. Reward for being near ANY fire (not just target)
+        nearest_fire_distance = self._get_distance_to_nearest_fire()
+        if nearest_fire_distance < 2:
+            reward += 1.0  # Reward for being very close to any fire
+        elif nearest_fire_distance < 4:
+            reward += 0.3  # Small reward for being near any fire
         
-        # 5. Base camping penalty (NEW - forces drone to leave base ASAP)
+        # 4. Resource management - REDUCED penalty
+        if drone.energy < 10 or drone.water_level == 0:
+            reward -= 1.0  # Reduced penalty for poor resource management
+        elif drone.energy < 20:
+            reward -= 0.5  # Small penalty for low energy
+        
+        # 5. Base camping penalty (REDUCED - more reasonable)
         if drone.position == (0, 0) and drone.refueling_time == 0:
             # Drone is at base but not refueling - apply penalty
-            reward -= 3.0  # Strong penalty for unnecessary base camping
+            reward -= 1.0  # Reduced penalty for unnecessary base camping
             # Additional penalty if there are active fires
             if current_fires > 0:
-                reward -= 2.0  # Extra penalty when fires are burning
+                reward -= 0.5  # Reduced extra penalty when fires are burning
         
         # 6. Exploration bonus for discovering new fires
         if len(drone.known_fires) > 0:
@@ -242,8 +259,8 @@ class RLWildfireEnv(gym.Env):
         distance_bonus = self._calculate_distance_bonus()
         reward += distance_bonus
         
-        # 10. Time penalty (encourage efficiency)
-        reward -= 0.1
+        # 10. Time penalty (encourage efficiency) - REMOVED: was causing constant negative rewards
+        # reward -= 0.1  # This was making rewards negative every step!
         
         return reward
     
@@ -360,6 +377,37 @@ class RLWildfireEnv(gym.Env):
         drone = self.base_env.drone
         return math.sqrt((drone.position[0] - target_pos[0])**2 + 
                         (drone.position[1] - target_pos[1])**2)
+    
+    def _get_distance_to_nearest_fire(self) -> float:
+        """Get distance to nearest fire."""
+        drone = self.base_env.drone
+        if not drone.known_fires:
+            return 10.0  # Large distance if no known fires
+        
+        min_distance = float('inf')
+        for fire_pos in drone.known_fires:
+            distance = self._distance_to(fire_pos)
+            min_distance = min(min_distance, distance)
+        
+        return min_distance if min_distance != float('inf') else 10.0
+    
+    def _is_near_fire_for_suppression(self) -> bool:
+        """Check if drone is near a fire that can be suppressed."""
+        drone = self.base_env.drone
+        row, col = drone.position
+        
+        # Check adjacent cells for fires (suppression range = 1)
+        for dr in [-1, 0, 1]:
+            for dc in [-1, 0, 1]:
+                if dr == 0 and dc == 0:
+                    continue  # Skip center cell
+                check_row, check_col = row + dr, col + dc
+                if (0 <= check_row < self.grid_size and 
+                    0 <= check_col < self.grid_size):
+                    cell_type = self.base_env.grid[check_row, check_col]
+                    if cell_type in [self.base_env.FIRE, self.base_env.FIRE_INTENSE]:
+                        return True
+        return False
     
     def _is_valid_position(self, pos: Tuple[int, int]) -> bool:
         """Check if position is within grid bounds."""
