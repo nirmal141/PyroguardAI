@@ -28,6 +28,10 @@ class FirefighterDrone:
         self.known_fires = []    # List of detected fires
         self.patrol_target = None  # Current patrol destination
         
+        # Base refueling state
+        self.refueling_time = 0      # Time spent refueling at base
+        self.refueling_duration = 5  # Steps required to complete refueling
+        
         # Performance tracking
         self.fires_extinguished = 0
         self.steps_taken = 0
@@ -47,6 +51,10 @@ class FirefighterDrone:
         self.trail.append(tuple(self.position))
         if len(self.trail) > self.max_trail_length:
             self.trail.pop(0)
+        
+        # Check if drone is currently refueling at base
+        if self.refueling_time > 0:
+            return self._continue_refueling()
         
         # Check if drone needs to return to base
         if self.energy < 20 or self.water_level == 0:
@@ -189,13 +197,12 @@ class FirefighterDrone:
         base_position = (0, 0)  # Base at origin
         
         if self._distance_to(base_position) <= 1:
-            # Refuel at base
-            self.water_level = self.max_water
-            self.energy = self.max_energy
+            # Start refueling process at base
+            self.refueling_time = 1  # Start refueling timer
             return {
-                'action': 'refueled',
-                'water_level': self.water_level,
-                'energy_level': self.energy
+                'action': 'start_refueling',
+                'refueling_progress': 0,
+                'refueling_duration': self.refueling_duration
             }
         else:
             # Move towards base
@@ -204,6 +211,32 @@ class FirefighterDrone:
                 'action': 'return_to_base',
                 'moved': moved,
                 'distance_to_base': self._distance_to(base_position)
+            }
+    
+    def _continue_refueling(self) -> dict:
+        """Continue the refueling process at base."""
+        self.refueling_time += 1
+        
+        # Check if refueling is complete
+        if self.refueling_time >= self.refueling_duration:
+            # Refueling complete - restore full resources
+            self.water_level = self.max_water
+            self.energy = self.max_energy
+            self.refueling_time = 0  # Reset refueling timer
+            
+            return {
+                'action': 'refueled',
+                'water_level': self.water_level,
+                'energy_level': self.energy,
+                'refueling_progress': 100
+            }
+        else:
+            # Still refueling
+            progress = (self.refueling_time / self.refueling_duration) * 100
+            return {
+                'action': 'refueling',
+                'refueling_progress': progress,
+                'time_remaining': self.refueling_duration - self.refueling_time
             }
     
     def _move_towards_position(self, target_pos: Tuple[int, int]) -> bool:
@@ -262,7 +295,7 @@ class FirefighterDrone:
     
     def get_status(self) -> dict:
        
-        return {
+        status = {
             'position': tuple(self.position),
             'water_level': self.water_level,
             'water_percentage': (self.water_level / self.max_water) * 100,
@@ -273,3 +306,13 @@ class FirefighterDrone:
             'target_fire': self.target_fire,
             'steps_taken': self.steps_taken
         }
+        
+        # Add refueling status if currently refueling
+        if self.refueling_time > 0:
+            status['refueling'] = True
+            status['refueling_progress'] = (self.refueling_time / self.refueling_duration) * 100
+            status['refueling_time_remaining'] = self.refueling_duration - self.refueling_time
+        else:
+            status['refueling'] = False
+            
+        return status
