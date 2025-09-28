@@ -1,0 +1,80 @@
+{
+  "episode_rewards": [
+    -399.94280413646914,
+    -348.5678582291103,
+    -103.40493656175403,
+    30.390035778728436,
+    -43.05024543039283,
+    50.066819147187516,
+    -12.592060277061183,
+    -91.4427291017289,
+    -275.31726766727405,
+    98.43584767146312
+  ],
+  "episode_lengths": [
+    81,
+    69,
+    36,
+    23,
+    36,
+    22,
+    32,
+    34,
+    60,
+    9
+  ],
+  "success_rates": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "epsilon_values": [
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01,
+    0.01
+  ],
+  "evaluation_results": [
+    {
+      "episode": 5,
+      "mean_reward": -6.846295889566113,
+      "std_reward": 90.30302526867565,
+      "mean_length": 29.0,
+      "success_rate": 0.2,
+      "total_episodes": 10
+    },
+    {
+      "episode": 10,
+      "mean_reward": -7.574804676275335,
+      "std_reward": 82.149624341996,
+      "mean_length": 29.7,
+      "success_rate": 0.2,
+      "total_episodes": 10
+    },
+    {
+      "episode": 10,
+      "mean_reward": -45.466985090479135,
+      "std_reward": 112.12254238218618,
+      "mean_length": 30.8,
+      "success_rate": 0.05,
+      "total_episodes": 20
+    }
+  ],
+  "total_episodes": 10,
+  "total_training_time_minutes": 0.4522895932197571,
+  "final_success_rate": 0.1,
+  "final_average_reward": -109.54251988064115
+}
